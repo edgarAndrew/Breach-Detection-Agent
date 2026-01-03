@@ -1,5 +1,7 @@
 from fastapi import HTTPException, status
 from app.repositories.rule import RuleRepository
+from app.repositories.webhook import WebhookRepository
+from app.repositories.rawevent import RawEventRepository
 from app.routers.utils import normalize
 from fastapi.responses import JSONResponse
 from groq import Groq
@@ -52,6 +54,8 @@ Only a valid JSON document containing all parsed rules.
 class RuleController:
     def __init__(self, db):
         self.repo = RuleRepository(db)
+        self.webhookRepo = WebhookRepository(db)
+        self.raweventRepo = RawEventRepository(db)
 
     async def create(self, payload):
         if not await self.repo.datasource_exists(payload.data_src_id):
@@ -164,3 +168,14 @@ class RuleController:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"LLM processing failed: {str(e)}"
             )
+        
+    async def get_events_by_rule_and_time_range(self,rule_id: str,start_ts: float,end_ts: float):
+        data_src_id = await self.repo.get_data_source_id_from_rule_id(rule_id)
+        if not data_src_id:
+            raise HTTPException(404, "Rule not found")
+        
+        webhook_id = await self.webhookRepo.get_webhook_id_from_data_source_id(data_src_id)
+        if not webhook_id:
+            raise HTTPException(404, "Datasource not found")
+        
+        return await self.raweventRepo.get_by_webhook_and_time_range(webhook_id,start_ts,end_ts)

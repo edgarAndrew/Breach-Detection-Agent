@@ -28,3 +28,10 @@ class RuleRepository:
         user = await self.uo.find_one({"user_id": user_id})
         res = await self.ds.find_one({"org_id": user['org_id']})    
         return res.get("fields", [])
+    
+    async def get_data_source_id_from_rule_id(self, rule_id: str):
+        rule = await self.col.find_one({"_id": ObjectId(rule_id)})
+        
+        if not rule:
+            return None
+        return rule.get("data_src_id")
