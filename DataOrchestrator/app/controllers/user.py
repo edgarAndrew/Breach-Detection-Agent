@@ -3,6 +3,7 @@ from app.repositories.user import UserRepository
 from app.routers.utils import normalize
 from passlib.context import CryptContext
 from app.models.user import UserCreate
+from app.utils.jwt import create_access_token
 
 class UserController:
     def __init__(self, db):
@@ -17,7 +18,12 @@ class UserController:
         user_data = payload.dict()
         user_data["password"] = hashed_password
         
-        return normalize(await self.repo.create(user_data))
+        user = await self.repo.create(user_data)
+        if not user:
+            raise HTTPException(500, "Failed to create user")
+        access_token = create_access_token(data={"sub": str(user["_id"])})
+        return {"access_token": access_token, "token_type": "bearer"}
+        
 
     async def list(self):
         return [normalize(u) for u in await self.repo.list()]
@@ -30,4 +36,5 @@ class UserController:
         if not self.pwd_context.verify(password, user["password"]):
             raise HTTPException(401, "Invalid password")
         
-        return normalize(user)
+        access_token = create_access_token(data={"sub": str(user["_id"])})
+        return {"access_token": access_token, "token_type": "bearer"}
