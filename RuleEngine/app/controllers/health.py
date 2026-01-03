@@ -1,35 +1,45 @@
 import logging
 import httpx
+from datetime import datetime, timezone
 
 logger = logging.getLogger(__name__)
 
 RULES_SERVICE_URL = "http://127.0.0.1:8080/api/rules"
 
+
+def iso_to_epoch(ts: str) -> float:
+    """Convert ISO timestamp to epoch seconds"""
+    return datetime.fromisoformat(ts.replace("Z", "+00:00")).timestamp()
+
+
 async def evaluate_health(payload: dict):
     """
     Expects payload with:
     - rule_id: str
-    - data: List[Dict] each with timestamp and attribute field
-      (attribute name will be fetched from the rule)
-    
+    - rawevents: List[{
+        payload: { <metrics>, time_stamp }
+      }]
+
     Returns overall health, slope, threshold, and trend.
     """
     rule_id = payload["rule_id"]
-    data_points = payload["data"]
+    rawevents = payload.get("rawevents", [])
 
-    logger.info(f"Health evaluation requested for rule_id={rule_id}, data_points={len(data_points)}")
+    logger.info(
+        f"Health evaluation requested for rule_id={rule_id}, rawevents={len(rawevents)}"
+    )
 
     try:
-        if not data_points or len(data_points) < 2:
+        if len(rawevents) < 2:
             return {
                 "rule_id": rule_id,
                 "overall_health": "INSUFFICIENT_DATA",
                 "slope": None,
                 "threshold": None,
-                "trend": data_points
+                "trend": []
             }
 
-        # Fetch rules from endpoint
+        # Fetch rules
         async with httpx.AsyncClient() as client:
             resp = await client.get(RULES_SERVICE_URL)
             resp.raise_for_status()
@@ -43,42 +53,56 @@ async def evaluate_health(payload: dict):
         operator = matched_rule["operator"]
         attribute = matched_rule["attribute_name"]
 
-        # Sort data by timestamp
-        data_points = sorted(data_points, key=lambda x: x["timestamp"])
-        values = [d[attribute] for d in data_points]
+        # Extract (timestamp, value)
+        extracted = []
+        for event in rawevents:
+            p = event.get("payload", {})
+            if attribute not in p or "time_stamp" not in p:
+                continue
 
-        # Calculate slope
-        slope = (values[-1] - values[0]) / (len(values) - 1)
-        start = values[0]
-        end = values[-1]
+            extracted.append({
+                "timestamp": iso_to_epoch(p["time_stamp"]),
+                "value": float(p[attribute])
+            })
 
-        # Health calculation
+        if len(extracted) < 2:
+            return {
+                "rule_id": rule_id,
+                "overall_health": "INSUFFICIENT_DATA",
+                "slope": None,
+                "threshold": threshold,
+                "trend": []
+            }
+
+        # Sort by timestamp
+        extracted.sort(key=lambda x: x["timestamp"])
+
+        values = [e["value"] for e in extracted]
+        start, end = values[0], values[-1]
+
+        slope = (end - start) / (len(values) - 1)
+
+        # Health logic
         if abs(end - start) < 0.01:
             overall_health = "STABLE"
         else:
-            risky_direction = None
-            if operator in ["gt", "gte"]:
-                risky_direction = "increase"
-            elif operator in ["lt", "lte"]:
-                risky_direction = "decrease"
-            elif operator == "eq":
-                risky_direction = "deviation"
-
-            if risky_direction == "increase":
+            if operator in ("gt", "gte"):
                 if end >= threshold:
                     overall_health = "MOVING_TOWARDS_THRESHOLD"
                 elif end > start:
                     overall_health = "DETERIORATING"
                 else:
                     overall_health = "MOVING_AWAY_FROM_THRESHOLD"
-            elif risky_direction == "decrease":
+
+            elif operator in ("lt", "lte"):
                 if end <= threshold:
                     overall_health = "MOVING_TOWARDS_THRESHOLD"
                 elif end < start:
                     overall_health = "DETERIORATING"
                 else:
                     overall_health = "MOVING_AWAY_FROM_THRESHOLD"
-            elif risky_direction == "deviation":
+
+            elif operator == "eq":
                 if abs(end - threshold) <= 0.01:
                     overall_health = "MOVING_TOWARDS_THRESHOLD"
                 elif abs(end - start) > 0:
@@ -86,10 +110,13 @@ async def evaluate_health(payload: dict):
                 else:
                     overall_health = "MOVING_AWAY_FROM_THRESHOLD"
 
-        # Build trend with threshold included
         trend = [
-            {"timestamp": d["timestamp"], attribute: d[attribute], "threshold": threshold}
-            for d in data_points
+            {
+                "timestamp": e["timestamp"],
+                "value": e["value"],
+                "threshold": threshold
+            }
+            for e in extracted
         ]
 
         return {
@@ -101,5 +128,5 @@ async def evaluate_health(payload: dict):
         }
 
     except Exception as e:
-        logger.error(f"Unexpected error during health evaluation: {e}")
-        raise e
+        logger.exception("Unexpected error during health evaluation")
+        raise
