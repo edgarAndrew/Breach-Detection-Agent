@@ -1,6 +1,5 @@
 from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorDatabase
-from typing import List, Dict, Any
 
 class RawEventRepository:
     def __init__(self, db: AsyncIOMotorDatabase):
@@ -22,3 +21,20 @@ class RawEventRepository:
             return []
         res = await self.col.insert_many(docs)
         return res.inserted_ids
+    
+    async def get_by_webhook_and_time_range(self,webhook_id: str,start_ts: float,end_ts: float):
+        """
+        Get all raw events for a webhook within a time range.
+        Timestamps are epoch seconds.
+        """
+        cursor = self.col.find(
+            {
+                "webhook_id": webhook_id,
+                "ingested_at": {
+                    "$gte": start_ts,
+                    "$lte": end_ts,
+                },
+            }
+        )
+
+        return [doc async for doc in cursor]

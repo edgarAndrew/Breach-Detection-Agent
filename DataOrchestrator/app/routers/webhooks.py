@@ -1,19 +1,25 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from app.models.webhook import WebhookCreate, WebhookOut
 from app.database.database import get_database
-from app.routers.utils import normalize, oid
+from app.controllers.webhook import WebhookController
 
 router = APIRouter(tags=["Webhooks"])
 
-@router.post("", response_model=WebhookOut, status_code=201)
-async def create_webhook(w: WebhookCreate, db=Depends(get_database)):
-    if not await db.datasources.find_one({"_id": oid(w.data_src_id)}):
-        raise HTTPException(404, "Datasource not found")
 
-    res = await db.webhooks.insert_one(w.dict())
-    doc = await db.webhooks.find_one({"_id": res.inserted_id})
-    return normalize(doc)
+def get_controller(db=Depends(get_database)) -> WebhookController:
+    return WebhookController(db)
+
+
+@router.post("", response_model=WebhookOut, status_code=201)
+async def create_webhook(
+    w: WebhookCreate,
+    controller: WebhookController = Depends(get_controller),
+):
+    return await controller.create(w)
+
 
 @router.get("", response_model=list[WebhookOut])
-async def list_webhooks(db=Depends(get_database)):
-    return [normalize(w) async for w in db.webhooks.find()]
+async def list_webhooks(
+    controller: WebhookController = Depends(get_controller),
+):
+    return await controller.list()
