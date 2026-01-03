@@ -3,7 +3,7 @@ import asyncio
 import logging
 from typing import Dict, List
 import aiohttp
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Literal
 import os
 
@@ -17,6 +17,7 @@ RULE_REFRESH_INTERVAL = 60  # seconds
 # Rule Model
 # -------------------------
 class Rule(BaseModel):
+    id: str | None = Field(alias="_id")
     rule_name: str
     rule_id: str
     data_src_id: str
@@ -25,6 +26,12 @@ class Rule(BaseModel):
     threshold: float
     near_thres: float = 0.0
     operator: Literal["gt", "lt", "gte", "lte", "eq"]
+
+    model_config = {
+        "validate_by_name": True
+    }
+
+
 
 # -------------------------
 # In-memory cache
@@ -45,6 +52,7 @@ async def fetch_all_rules() -> Dict[str, List[Rule]]:
 
             for r in data:
                 rule = Rule(
+                    id=r.get("_id"),
                     rule_name=r["rule_name"],
                     rule_id=r["rule_id"],
                     data_src_id=r["data_src_id"],
