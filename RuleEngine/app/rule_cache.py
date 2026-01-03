@@ -5,10 +5,12 @@ from typing import Dict, List
 import aiohttp
 from pydantic import BaseModel
 from typing import Literal
+import os
 
 logger = logging.getLogger(__name__)
 
-RULE_SERVICE_URL = "http://localhost:8080/api/rules"
+DATA_ORCHESTRATOR_SERVICE_URL = os.getenv("DATA_ORCHESTRATOR_SERVICE_URL", "http://localhost:8080") 
+RULE_SERVICE_URL = f"{DATA_ORCHESTRATOR_SERVICE_URL}/api/rules"
 RULE_REFRESH_INTERVAL = 60  # seconds
 
 # -------------------------
