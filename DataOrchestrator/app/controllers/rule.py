@@ -63,9 +63,10 @@ class RuleController:
         self.userController = UserController(db)
 
     async def create(self, payload, user_id):
-        col_ids = self.userController.get_data_src(user_id)
+        col_ids = await self.userController.get_data_src(user_id)
         datasource_id = col_ids["datasource_id"]
         org_id = col_ids["org_id"]
+
         if not await self.repo.datasource_exists(datasource_id):
             raise HTTPException(404, "Datasource not found")
         
@@ -73,7 +74,10 @@ class RuleController:
             {**p, "data_src_id": datasource_id, "org_id": org_id}
             for p in payload
         ]
-        return normalize(await self.repo.create(payload))
+
+        docs = await self.repo.create(payload)
+
+        return [normalize(doc) for doc in docs]
 
     async def list(self):
         return [normalize(r) for r in await self.repo.list()]

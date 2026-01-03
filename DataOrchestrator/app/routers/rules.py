@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, File, UploadFile,Query
+from fastapi import APIRouter, Depends, File, UploadFile,Query,Body
 from app.models.rule import RuleCreate, RuleOut, LLMRuleOut
 from app.database.database import get_database
 from app.controllers.rule import RuleController
@@ -12,7 +12,7 @@ def get_controller(db=Depends(get_database)):
 
 @router.post("/create", status_code=201)
 async def create_rule(
-    payload,
+    payload=Body(...),
     controller=Depends(get_controller),
     user_id: str = Depends(verify_token)
 ):
