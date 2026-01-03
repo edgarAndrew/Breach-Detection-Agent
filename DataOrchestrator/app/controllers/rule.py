@@ -8,6 +8,8 @@ from groq import Groq
 import PyPDF2
 import io
 import json
+import os
+import httpx
 
 # System prompt to enforce structured JSON output
 RULES_PROMPT = """
@@ -50,6 +52,7 @@ Output
 Only a valid JSON document containing all parsed rules.
 """
 
+RULE_SERVICE_URL = os.getenv("RULE_SERVICE_URL", "http://localhost:8081/health/evaluate")
 
 class RuleController:
     def __init__(self, db):
@@ -188,12 +191,37 @@ class RuleController:
         
         rawevents = await self.raweventRepo.get_by_webhook_and_time_range(webhook_id,start_ts,end_ts)
 
-        return {
+        if len(rawevents) == 0:
+            raise HTTPException(404, "No raw events founds beween start_ts and end_ts")
+        
+        payload = {
             "rule_id": rule_id,
-            "rawevents": rawevents,
+            "rawevents": rawevents
         }
+        
+        return await self.evaluate_health_rule(payload)
+
     
     async def get_by_id(self, rule_id: str):
         if not await self.repo.get_by_id(rule_id):
             raise HTTPException(404, "Rule not found")
         return normalize(await self.repo.get_by_id(rule_id))
+    
+    async def evaluate_health_rule(self,payload: dict):
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            try:
+                response = await client.post(RULE_SERVICE_URL, json=payload)
+                response.raise_for_status()
+                return response.json()
+
+            except httpx.HTTPStatusError as e:
+                raise HTTPException(
+                    status_code=e.response.status_code,
+                    detail=e.response.text
+                )
+
+            except httpx.RequestError as e:
+                raise HTTPException(
+                    status_code=503,
+                    detail=f"Rule engine unreachable: {str(e)}"
+                )
