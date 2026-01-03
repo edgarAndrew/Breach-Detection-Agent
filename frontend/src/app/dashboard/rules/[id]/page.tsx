@@ -32,8 +32,8 @@ function RuleDetailsPage({ params }: { params: Promise<{ id: string }> }) {
                 toast.error("Failed to fetch organization details.");
                 return;
             }
-            // const trendResponse = await getOrgRulesTrend(id, orgResponse.data.org_id);
-            const trendResponse = await getOrgRulesTrend('rule_001', 'os-comp');
+            const trendResponse = await getOrgRulesTrend(id, orgResponse.data.org_id);
+            // const trendResponse = await getOrgRulesTrend('rule_001', 'os-comp');
             if (trendResponse.status != 200 || !trendResponse.data) {
                 toast.error("Failed to fetch trend data.");
                 return;
@@ -46,7 +46,7 @@ function RuleDetailsPage({ params }: { params: Promise<{ id: string }> }) {
 
     return (
         <main className="mx-auto w-full max-w-5xl px-4 space-y-8">
-            {rule && trendData && <RuleDetails rule={rule} data={trendData} />}
+            {rule && trendData && <RuleDetails rule={rule} data={trendData}  setData={setTrendData} />}
         </main>
     )
 }

@@ -22,11 +22,11 @@ const navigationItems = [
     {
         heading: "Configuration",
         items: [
-            {
-                title: "Data source",
-                url: "/datasource",
-                icon: Database,
-            },
+            // {
+            //     title: "Data source",
+            //     url: "/datasource",
+            //     icon: Database,
+            // },
             {
                 title: "Rules",
                 url: "/rules",

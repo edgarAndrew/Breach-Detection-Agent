@@ -23,3 +23,7 @@ export function convertRulePDFtoJSON(payload: FormData) {
     console.log("File in FormData:", payload.get("file"));
     return apiClientFile.post(`/api/rules/pdf-to-json`, payload);
 }
+
+export function runRuleOnDemand(rule_id: string, start_ts: number, end_ts: number){
+    return apiClient.get(`/api/rules/events?rule_id=${rule_id}&start_ts=${start_ts}&end_ts=${end_ts}`)
+}
