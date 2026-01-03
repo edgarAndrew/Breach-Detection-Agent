@@ -27,3 +27,17 @@ class UserOrganizationRepository:
 
     async def get_membership_by_user(self, user_id) -> dict | None:
         return await self.col.find_one({"user_id": user_id})
+    
+    async def get_user_id_by_org(self, org_id: str) -> str | None:
+        """
+        Returns user_id for a given org_id.
+        If multiple users exist, owner is preferred.
+        """
+
+        owner = await self.col.find_one(
+            {"org_id": org_id, "role_type": "owner"}
+        )
+        if owner:
+            return owner["user_id"]
+
+        return None

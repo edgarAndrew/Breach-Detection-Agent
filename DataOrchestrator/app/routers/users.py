@@ -21,3 +21,7 @@ async def list_users(c=Depends(get_controller)):
 @router.post("/login", response_model=Token)
 async def login_user(payload: UserCreate, c:UserController = Depends(get_controller)):
     return await c.login(payload.email, payload.password)
+
+@router.get("/{user_id}")
+async def get_user_email(user_id: str,c: UserController = Depends(get_controller)):
+    return await c.get_email(user_id)

@@ -23,3 +23,20 @@ class AlertRepository:
     
     async def list(self):
         return [a async for a in self.col.find()]
+    
+    async def list_unsent(self):
+        """
+        Return all alerts where email_sent == False.
+        """
+        cursor = self.col.find({"email_sent": False})
+        return [a async for a in cursor]
+    
+    async def list_unsent_by_org(self, org_id: str):
+        """
+        Return all alerts where email_sent == False for a specific organization.
+        """
+        cursor = self.col.find({
+            "org_id": org_id,
+            "email_sent": False
+        })
+        return [a async for a in cursor]

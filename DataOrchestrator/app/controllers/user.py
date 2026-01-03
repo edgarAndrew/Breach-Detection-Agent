@@ -38,3 +38,9 @@ class UserController:
         
         access_token = create_access_token(data={"sub": str(user["_id"])})
         return {"access_token": access_token, "token_type": "bearer"}
+
+    async def get_email(self, user_id: str):
+        email = await self.repo.get_email_by_id(user_id)
+        if not email:
+            raise HTTPException(status_code=404, detail="User not found")
+        return {"email": email}

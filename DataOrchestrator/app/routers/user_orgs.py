@@ -18,3 +18,10 @@ async def add_user_to_org(
 @router.get("", response_model=list[UserOrganizationOut])
 async def list_memberships(controller=Depends(get_controller)):
     return await controller.list()
+
+@router.get("/{org_id}/user")
+async def get_user_from_org(org_id: str,controller=Depends(get_controller)):
+    """
+    Returns email of the owner (preferred) or first user of the organization.
+    """
+    return await controller.getUserFromOrg(org_id)

@@ -11,6 +11,7 @@ DATA_ORCHESTRATOR_DIR = BASE_DIR / "DataOrchestrator"
 RULE_ENGINE_DIR = BASE_DIR / "RuleEngine"
 VALIDATION_SERVICE_DIR = BASE_DIR / "ValidationService"
 WEBHOOK_SERVICE_DIR = BASE_DIR / "WebhookService"
+ALERTS_SERVICE_DIR = BASE_DIR / "AlertsService"
 
 # Load environment variables
 load_dotenv(BASE_DIR / ".env")
@@ -19,6 +20,7 @@ DATA_ORCHESTRATOR_PORT = int(os.getenv("DATA_ORCHESTRATOR_PORT", 8080))
 RULE_ENGINE_PORT = int(os.getenv("RULE_ENGINE_PORT", 8081))
 VALIDATION_SERVICE_PORT = int(os.getenv("VALIDATION_SERVICE_PORT", 8082))
 WEBHOOK_SERVICE_PORT = int(os.getenv("WEBHOOK_SERVICE_PORT", 8083))
+ALERTS_SERVICE_PORT = int(os.getenv("ALERTS_SERVICE_PORT", 8084))
 
 
 def start_service(name: str, cwd: Path, port: int):
@@ -65,7 +67,10 @@ def start_validation_service():
     return start_service("Validation Service",VALIDATION_SERVICE_DIR,VALIDATION_SERVICE_PORT)
 
 def start_webhook_service():
-    return start_service("Webhook Service",WEBHOOK_SERVICE_DIR,WEBHOOK_SERVICE_PORT,)
+    return start_service("Webhook Service",WEBHOOK_SERVICE_DIR,WEBHOOK_SERVICE_PORT)
+
+def start_alerts_service():
+    return start_service("Alerts Service",ALERTS_SERVICE_DIR,ALERTS_SERVICE_PORT)
 
 
 # Control which services run here
@@ -75,6 +80,7 @@ ENABLED_SERVICES = [
     start_rule_engine,
     start_validation_service,
     start_webhook_service,
+    start_alerts_service
     # Comment out any service to skip it
 ]
 

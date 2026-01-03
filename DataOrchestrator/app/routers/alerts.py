@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from app.models.alert import AlertCreate, AlertOut
 from app.database.database import get_database
 from app.controllers.alert import AlertController
+from typing import Dict, List
 
 router = APIRouter(tags=["Alerts"])
 
@@ -15,6 +16,20 @@ async def create_alert(
 ):
     return await controller.create(payload)
 
-@router.get("", response_model=list[AlertOut])
+@router.get("")
 async def list_alerts(controller=Depends(get_controller)):
     return await controller.list()
+
+@router.get("/unsent")
+async def list_unsent_alerts_grouped(controller=Depends(get_controller)):
+    """
+    Get all alerts where email_sent == false, grouped by org_id
+    """
+    return await controller.list_unsent_grouped()
+
+@router.get("/unsent/{org_id}")
+async def list_unsent_alerts_for_org(org_id,controller=Depends(get_controller)):
+    """
+    Get all unsent alerts (email_sent = false) for a specific organization
+    """
+    return await controller.list_unsent_by_org(org_id)

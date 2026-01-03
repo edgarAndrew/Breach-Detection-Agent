@@ -21,6 +21,10 @@ python -m venv venv
 ```
 pip install -r requirements.txt
 ```
+
+#### Environment variables
+- Refer to .env.example placeholder and create a .env file at the same level
+
 #### Start application
 ```
 python run.py
