@@ -12,7 +12,7 @@ type Alert = {
     threshold: number
     message: string
     insights: Record<string, unknown>
-    created_at: Date
+    ingested_at: number
     email_sent: boolean
 }
 

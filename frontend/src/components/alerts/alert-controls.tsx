@@ -1,7 +1,7 @@
 import { SORT_OPTIONS, STATUS_OPTIONS } from "@/constants/alert";
 import { AlertStatus } from "@/types/alert"
 import type { SortOption } from '@/types/sort-options';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@radix-ui/react-select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertCircle } from "lucide-react";
 
 interface AlertControlsProps {

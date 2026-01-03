@@ -1,31 +1,18 @@
 'use client';
 import { DETAIL_CARDS, STATUS_CONFIG } from "@/constants/styles";
-import { cn } from "@/lib/utils";
+import { cn, unixToDate } from "@/lib/utils";
 import Alert from "@/types/alert";
 import { AlertCircle, Bell, ChevronDown, Clock, Sparkles, TrendingUp, Zap } from "lucide-react";
 import DetailCard from "./detail-card";
 import PulsingDot from "./pulsing-dot";
-import { useState } from "react";
 
 function AlertRow({ alert, isOpen, onToggle }: { alert: Alert; isOpen: boolean; onToggle: () => void }) {
-    const [timeLabel, setTimeLabel] = useState("")
+
     const config = STATUS_CONFIG[alert.status]
-    const formattedDate = new Date(alert.created_at).toLocaleString()
-    
-    function getTimeSince(){
-        // eslint-disable-next-line react-hooks/purity
-        const timeSince = Math.floor((Date.now() - new Date(alert.created_at).getTime()) / 1000)
-        let timeLabel = ""
-        if (timeSince < 60) timeLabel = "Just now"
-        else if (timeSince < 3600) timeLabel = `${Math.floor(timeSince / 60)}m ago`
-        else if (timeSince < 86400) timeLabel = `${Math.floor(timeSince / 3600)}h ago`
-        else timeLabel = `${Math.floor(timeSince / 86400)}d ago`
-        setTimeLabel(timeLabel)
-    }
+    const formattedDate = new Date(unixToDate(alert.ingested_at)).toLocaleString()
     const percentDiff = Math.abs(((alert.current_value - alert.threshold) / alert.threshold) * 100).toFixed(1)
     const isExceeding = alert.current_value > alert.threshold
     const deviationConfig = isExceeding ? DETAIL_CARDS.deviation.breach : DETAIL_CARDS.deviation.safe
-    getTimeSince()
 
     return (
         <div className={cn(
@@ -72,7 +59,7 @@ function AlertRow({ alert, isOpen, onToggle }: { alert: Alert; isOpen: boolean; 
                             </span>
                             <span className="flex items-center gap-1.5 font-medium">
                                 <Clock className="w-3.5 h-3.5" />
-                                {timeLabel}
+                                {unixToDate(alert.ingested_at).toLocaleString()}
                             </span>
                             {alert.email_sent && (
                                 <span className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 font-medium">
