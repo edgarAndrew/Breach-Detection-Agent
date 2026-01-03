@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends
-from app.models.rule import RuleCreate, RuleOut
+from fastapi import APIRouter, Depends, File, UploadFile
+from app.models.rule import RuleCreate, RuleOut, LLMRuleOut
 from app.database.database import get_database
 from app.controllers.rule import RuleController
 from app.controllers.user_org import UserOrganizationController
@@ -30,3 +30,7 @@ async def get_org_rules(user_id: str = Depends(verify_token), controller=Depends
 @router.delete("/{rule_id}", status_code=204)
 async def delete_rule(rule_id: str, controller=Depends(get_controller)):
     await controller.delete(rule_id)
+    
+@router.post("/pdf-to-json", response_model=list[LLMRuleOut])
+async def pdf_to_json(file: UploadFile = File(...), controller=Depends(get_controller), user_id: str = Depends(verify_token)):
+    return await controller.convert_to_config(file, user_id)

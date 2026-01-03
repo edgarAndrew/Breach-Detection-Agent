@@ -5,6 +5,7 @@ class RuleRepository:
     def __init__(self, db: AsyncIOMotorDatabase):
         self.col = db.rules
         self.ds = db.datasources
+        self.uo = db.user_organizations
 
     async def datasource_exists(self, id: str):
         return await self.ds.find_one({"_id": ObjectId(id)})
@@ -22,3 +23,8 @@ class RuleRepository:
     async def delete(self, rule_id: str):
         res = await self.col.delete_one({"_id": ObjectId(rule_id)})
         return res
+    
+    async def getOrgFieldsFromUserID(self, user_id: str):
+        user = await self.uo.find_one({"user_id": user_id})
+        res = await self.ds.find_one({"org_id": user['org_id']})    
+        return res.get("fields", [])

@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from typing import Optional
 from app.models.base import MongoBaseModel
 
 class RuleCreate(BaseModel):
@@ -17,6 +16,13 @@ class RuleOut(MongoBaseModel):
     rule_id: str
     data_src_id: str
     org_id: str
+    attribute_name:str
+    threshold: float
+    near_thres: float
+    operator: str
+
+class LLMRuleOut(BaseModel):
+    rule_name: str
     attribute_name:str
     threshold: float
     near_thres: float
