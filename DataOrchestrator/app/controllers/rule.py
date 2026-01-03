@@ -124,9 +124,6 @@ class RuleController:
  
             llm_output = completion.choices[0].message.content or ""
 
-            with open("llm_output.txt", "w") as file:
-                file.write(llm_output)
-
             try:
                 parsed = json.loads(llm_output)
             except json.JSONDecodeError:
