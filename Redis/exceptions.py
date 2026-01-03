@@ -1,0 +1,2 @@
+class RedisPubSubError(Exception):
+    pass
