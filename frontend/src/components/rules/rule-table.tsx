@@ -11,14 +11,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { getOperatorText } from "@/lib/rule"
 import Rule from "@/types/rule"
 import { PAGE_SIZE } from "@/constants/shared"
-import { getOrgRules } from "@/lib/api/rule"
+import { deleteRule, getOrgRules } from "@/lib/api/rule"
 import { toast } from "sonner"
 
 function formatRule(rule: Rule) {
   return (
     <>
       <span className="font-semibold">If</span>{" "}
-      <span>{rule.field}</span>{" "}
+      <span>{rule.attribute_name}</span>{" "}
       <span className="text-muted-foreground">
         {getOperatorText(rule.operator)}
       </span>{" "}
@@ -38,7 +38,7 @@ function RuleTable() {
 
   const filteredRules = useMemo(() => {
     const q = search.toLowerCase()
-    return rules.filter((r) => `${r.field} ${getOperatorText(r.operator)} ${r.threshold}`.toLowerCase().includes(q))
+    return rules.filter((r) => `${r.attribute_name.toUpperCase()} ${getOperatorText(r.operator)} ${r.threshold}`.toLowerCase().includes(q))
   }, [rules, search])
 
   const totalPages = Math.ceil(filteredRules.length / PAGE_SIZE)
@@ -48,9 +48,20 @@ function RuleTable() {
     return filteredRules.slice(start, start + PAGE_SIZE)
   }, [filteredRules, page])
 
-  function handleDelete(id: string) {
-    setRules((prev) => prev.filter((r) => r.id !== id))
-    // TODO: Delete rule from backend
+  async function handleDelete(id: string) {
+    setRules((prev) => prev.filter((r) => r._id !== id))
+    try {
+      const response = await deleteRule(id)
+      if (response.status === 204) {
+        toast.success("Rule deleted successfully")
+      } else {
+        toast.error("Failed to delete rule")
+      }
+    }
+    catch (error) {
+      console.log(error)
+      toast.error("Failed to delete rule")
+    }
   }
 
   useEffect(() => {
@@ -69,7 +80,7 @@ function RuleTable() {
   return (
     <section className="space-y-4">
       <Input
-        placeholder="Search by metric ..."
+        placeholder="Search by field ..."
         value={search}
         onChange={(e) => { setSearch(e.target.value); setPage(1) }}
         className="w-full"
@@ -78,6 +89,12 @@ function RuleTable() {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead className="text-sm md:text-base font-semibold text-muted-foreground">
+              Rule ID
+            </TableHead>
+            <TableHead className="text-sm md:text-base font-semibold text-muted-foreground">
+              Rule Name
+            </TableHead>
             <TableHead className="text-sm md:text-base font-semibold text-muted-foreground">
               Rule
             </TableHead>
@@ -95,13 +112,15 @@ function RuleTable() {
             </TableRow>
           ) : (
             pageRules.map((rule) => (
-              <TableRow key={rule.id}>
+              <TableRow key={rule._id}>
+                <TableCell className="text-base font-medium leading-relaxed">{rule.rule_id}</TableCell>
+                <TableCell className="text-base font-medium leading-relaxed">{rule.rule_name}</TableCell>
                 <TableCell className="text-base font-medium leading-relaxed">
                   {formatRule(rule)}
                 </TableCell>
 
                 <TableCell className="text-right space-x-2">
-                  <Link href={`/dashboard/rules/${rule.id}`}>
+                  <Link href={`/dashboard/rules/${rule._id}`}>
                     <Button variant="ghost" size="sm" className="gap-1 text-primary hover:scale-110">
                       <CircleArrowOutUpRightIcon className="h-4 w-4" />
                     </Button>
@@ -129,7 +148,7 @@ function RuleTable() {
             <AlertDialogAction className="bg-red-600 hover:bg-red-700"
               onClick={() => {
                 if (ruleToDelete) {
-                  handleDelete(ruleToDelete.id)
+                  handleDelete(ruleToDelete._id)
                   setRuleToDelete(null)
                 }
               }}

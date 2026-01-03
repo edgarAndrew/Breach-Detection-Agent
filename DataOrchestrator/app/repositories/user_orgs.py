@@ -24,3 +24,6 @@ class UserOrganizationRepository:
 
     async def list(self) -> list[dict]:
         return [m async for m in self.col.find()]
+
+    async def get_membership_by_user(self, user_id) -> dict | None:
+        return await self.col.find_one({"user_id": user_id})

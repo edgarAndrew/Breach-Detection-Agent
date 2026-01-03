@@ -8,9 +8,9 @@ export const METRIC_OPTIONS: KeyValuePair<string>[] = [
 ]
 
 export const RULE_OPERATORS: KeyValuePair<string>[] = [
-    { key: '>', value: 'is greater than' },
-    { key: '<', value: 'is less than' },
-    { key: '>=', value: 'is at least' },
-    { key: '<=', value: 'is at most' },
-    { key: '=', value: 'equals' },
+    { key: 'gt', value: 'is greater than' },
+    { key: 'lt', value: 'is less than' },
+    { key: 'gte', value: 'is at least' },
+    { key: 'lte', value: 'is at most' },
+    { key: 'eq', value: 'equals' },
 ];

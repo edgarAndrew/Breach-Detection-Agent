@@ -2,7 +2,8 @@ import apiClient from "../http/client"
 import { RulesData } from "@/schema/rule/rules.schema"
 
 export function getOrgRules() {
-    return apiClient.get("/api/rules")
+    return apiClient.get("/api/rules/org")
+    // return apiClient.get("/api/rules")
 }
 
 export function createRule(payload: RulesData) {

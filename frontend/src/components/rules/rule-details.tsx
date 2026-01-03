@@ -15,7 +15,7 @@ type Props = {
 function RuleDetails({ rule, data }: Props) {
     function handleRun() {
         // TODO: Call run in the background
-        console.log(rule.id)
+        console.log(rule._id)
     }
 
     return (
@@ -23,10 +23,10 @@ function RuleDetails({ rule, data }: Props) {
             <header className="flex items-start justify-between gap-4">
                 <div>
                     <h1 className="text-xl md:text-2xl font-semibold leading-relaxed">
-                        If {rule.field} {getOperatorText(rule.operator)}{" "} {rule.threshold} within {rule.near_thres}%
+                        If {rule.attribute_name} {getOperatorText(rule.operator)}{" "} {rule.threshold} within {rule.near_thres}%
                     </h1>
                     <p className="mt-1 text-sm text-muted-foreground">
-                        Rule ID: {rule.id}
+                        Rule ID: {rule._id}
                     </p>
                 </div>
                 <Button onClick={handleRun} className="gap-2">

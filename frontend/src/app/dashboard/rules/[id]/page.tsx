@@ -8,16 +8,18 @@ export const metadata: Metadata = {
     description: "View rule configuration, execution results, and insights."
 }
 
-async function fetchRule(id: string): Promise<Rule> {
+async function fetchRule(id: string): Promise<Rule | null> {
     return {
-        id,
-        field: "CPU Usage",
-        operator: ">",
-        threshold: 75,
+        _id: id,
+        rule_name: "High CPU Usage",
+        rule_id: "RULE-12345",
+        data_src_id: "DS-67890",
+        attribute_name: "cpu_usage",
+        threshold: 80,
         near_thres: 5,
+        operator: "gt",
     }
 }
-
 async function fetchRuleData(id: string) {
     console.log(id)
     return Array.from({ length: 24 }).map((_, i) => ({

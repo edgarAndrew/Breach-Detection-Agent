@@ -1,12 +1,19 @@
-import type { Metadata } from "next"
+'use client'
 import RuleTable from "@/components/rules/rule-table"
-
-export const metadata: Metadata = {
-    title: "Rules",
-    description: "View and manage your alert rules",
-}
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/store/authStore"
+import { useEffect } from "react"
 
 function RuleListPage() {
+    const isAuthenticated = useAuth((state) => state.isAuthenticated)
+    const router = useRouter()
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            router.replace("/auth/signup")
+        }
+    }, [isAuthenticated, router])
+
     return (
         <main className="mx-auto w-full max-w-4xl px-4">
             <header className="pb-4 md:pb-6">

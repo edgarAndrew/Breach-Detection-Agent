@@ -22,3 +22,9 @@ class UserOrganizationController:
     async def list(self):
         docs = await self.repo.list()
         return [normalize(d) for d in docs]
+
+    async def getUserOrgId(self, user_id):
+        membership = await self.repo.get_membership_by_user(user_id)
+        if not membership:
+            raise HTTPException(404, "User organization not found")
+        return membership["org_id"]

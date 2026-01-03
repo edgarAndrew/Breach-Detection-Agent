@@ -13,3 +13,11 @@ class RuleController:
 
     async def list(self):
         return [normalize(r) for r in await self.repo.list()]
+
+    async def getOrgRules(self, org_id: str):
+        return [normalize(r) for r in await self.repo.getOrgRules(org_id)]
+    
+    async def delete(self, rule_id: str):
+        res = await self.repo.delete(rule_id)
+        if res.deleted_count == 0:
+            raise HTTPException(404, "Rule not found")

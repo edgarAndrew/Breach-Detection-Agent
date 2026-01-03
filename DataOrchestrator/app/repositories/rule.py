@@ -15,3 +15,10 @@ class RuleRepository:
 
     async def list(self):
         return [r async for r in self.col.find()]
+
+    async def getOrgRules(self, org_id: str):
+        return [r async for r in self.col.find({"org_id": org_id})]
+    
+    async def delete(self, rule_id: str):
+        res = await self.col.delete_one({"_id": ObjectId(rule_id)})
+        return res

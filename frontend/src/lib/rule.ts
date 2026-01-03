@@ -7,5 +7,5 @@ export function getOperatorText(operator: string): string {
 }
 
 export function formatRule(rule: Rule): string {
-    return `If ${rule.field} ${getOperatorText(rule.operator)} ${rule.threshold} within ${rule.near_thres}%`
+    return `If ${rule.attribute_name} ${getOperatorText(rule.operator)} ${rule.threshold} within ${rule.near_thres}%`
 }
