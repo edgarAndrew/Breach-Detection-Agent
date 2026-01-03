@@ -43,3 +43,10 @@ class AlertRepository:
 
     async def list_by_org(self, org_id: str):
         return [a async for a in self.col.find({"org_id": org_id})]
+    
+    async def mark_sent(self, ids):
+        """ Mark alerts as sent. """
+        await self.col.update_many(
+            {"_id": {"$in": ids}},
+            {"$set": {"email_sent": True}}
+        )

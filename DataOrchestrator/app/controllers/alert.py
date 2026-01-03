@@ -15,15 +15,18 @@ class AlertController:
         return [normalize(a) for a in await self.repo.list()]
 
     async def list_unsent_grouped(self):
-        """
-        Return alerts with email_sent == False, grouped by org_id.
-        """
+        """ Return all alerts where email_sent == False. Sends them and sets mark_sent == True. """
         alerts = await self.repo.list_unsent()
-        grouped = {}
 
+        if alerts:
+            ids = [a["_id"] for a in alerts]
+            await self.repo.mark_sent(ids)
+
+        grouped = {}
         for raw in alerts:
             org_id = raw.get("org_id", "unknown")
             normalized = normalize(raw)
+            normalized["email_sent"] = True
             grouped.setdefault(org_id, []).append(normalized)
 
         return grouped

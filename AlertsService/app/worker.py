@@ -8,7 +8,7 @@ from app.mailgun import send_email
 DATA_ORCHESTRATOR_SERVICE_URL = os.getenv("DATA_ORCHESTRATOR_SERVICE_URL", "http://localhost:8080")
 GET_UNSENT_ALERTS = f"{DATA_ORCHESTRATOR_SERVICE_URL}/api/alerts/unsent"
 GET_ORGANIZATION_EMAIL = "{base_url}/api/memberships/{org_id}/user"
-MAIL_WORKER_INTERVAL = float(os.getenv("MAIL_WORKER_INTERVAL", 60))
+MAIL_WORKER_INTERVAL = float(os.getenv("MAIL_WORKER_INTERVAL", 15))
 
 
 def get_org_email(org_id: str) -> str | None:
@@ -35,6 +35,11 @@ async def alert_worker():
             alerts_by_org = response.json()
         except Exception as e:
             print("Failed to fetch alerts:", e)
+            continue
+        
+        # Log if no unsent alerts
+        if not alerts_by_org or not any(alerts_by_org.values()):
+            print(f"[{datetime.utcnow()}] No unsent alerts found")
             continue
 
         batched_alerts = defaultdict(list)
