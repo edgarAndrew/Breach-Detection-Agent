@@ -1,5 +1,7 @@
 from fastapi import HTTPException
 from app.repositories.user import UserRepository
+from app.repositories.user_orgs import UserOrganizationRepository
+from app.repositories.datasource import DatasourceRepository
 from app.routers.utils import normalize
 from passlib.context import CryptContext
 from app.models.user import UserCreate
@@ -8,6 +10,8 @@ from app.utils.jwt import create_access_token
 class UserController:
     def __init__(self, db):
         self.repo = UserRepository(db)
+        self.uoRepo = UserOrganizationRepository(db)
+        self.dsRepo = DatasourceRepository(db)
         self.pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
     async def register(self, payload:UserCreate):
@@ -44,3 +48,20 @@ class UserController:
         if not email:
             raise HTTPException(status_code=404, detail="User not found")
         return {"email": email}
+    
+    async def get_data_src(self, user_id: str):
+        if not await self.repo.user_exists(user_id):
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        membership = await self.uoRepo.get_membership_by_user(user_id)
+        
+        if not membership:
+            raise HTTPException(404, "User organization not found")
+        
+        org_id = membership["org_id"]
+
+        datasource_id = await self.dsRepo.get_datasource_id_by_org_id(org_id)
+        if not datasource_id:
+            raise HTTPException(status_code=404, detail="Datasource not found")
+        
+        return {"datasource_id": datasource_id}

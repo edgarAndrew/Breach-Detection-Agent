@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends,Query
 from app.models.user import UserCreate, UserOut
 from app.database.database import get_database
 from app.controllers.user import UserController
@@ -25,3 +25,10 @@ async def login_user(payload: UserCreate, c:UserController = Depends(get_control
 @router.get("/{user_id}")
 async def get_user_email(user_id: str,c: UserController = Depends(get_controller)):
     return await c.get_email(user_id)
+
+@router.get("/get/datasource")
+async def get_user_datasource(
+    user_id: str = Query(..., description="User ID"),
+    c: UserController = Depends(get_controller)
+):
+    return await c.get_data_src(user_id)

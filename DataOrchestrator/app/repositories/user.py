@@ -5,6 +5,9 @@ class UserRepository:
     def __init__(self, db: AsyncIOMotorDatabase):
         self.col = db.users
 
+    async def user_exists(self, user_id: str):
+        return await self.col.find_one({"_id": ObjectId(user_id)})
+    
     async def email_exists(self, email: str):
         return await self.col.find_one({"email": email})
 

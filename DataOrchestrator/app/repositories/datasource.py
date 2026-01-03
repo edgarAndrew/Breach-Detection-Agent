@@ -22,3 +22,13 @@ class DatasourceRepository:
         user = await self.uo.find_one({"user_id": user_id})
         res = await self.collection.find_one({"org_id": user['org_id']})    
         return res.get("fields", [])
+    
+    async def get_datasource_id_by_org_id(self, org_id: str):
+        datasource = await self.collection.find_one(
+            {"org_id": org_id},
+            {"_id": 1}
+        )
+        if not datasource:
+            return None
+        
+        return str(datasource["_id"])
