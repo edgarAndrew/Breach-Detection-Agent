@@ -5,7 +5,6 @@ from fastapi.responses import JSONResponse
 from groq import Groq
 import PyPDF2
 import io
-import yaml
 import json
 
 # System prompt to enforce structured JSON output
@@ -127,14 +126,10 @@ class RuleController:
             try:
                 parsed = json.loads(llm_output)
             except json.JSONDecodeError:
-                try:
-                    parsed = yaml.safe_load(llm_output)
-                    parsed = json.loads(json.dumps(parsed))
-                except Exception:
-                    raise HTTPException(
-                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                        detail="LLM returned invalid JSON/YAML. Response was:\n" + llm_output[:200]
-                    )
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="LLM returned invalid JSON. Response was:\n" + llm_output[:200]
+                )
 
             if not isinstance(parsed, dict) or "rules" not in parsed:
                 raise HTTPException(

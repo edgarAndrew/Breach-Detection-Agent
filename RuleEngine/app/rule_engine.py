@@ -95,7 +95,7 @@ async def process_event(message: str):
                 alert = {
                     "event_id": event.event_id,
                     "org_id": event.org_id,
-                    "rule_id": rule.rule_id,
+                    "rule_id": rule.id,
                     "rule_name": rule.rule_name,
                     "status": status,
                     "field_name": rule.attribute_name,

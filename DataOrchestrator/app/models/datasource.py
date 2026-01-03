@@ -11,3 +11,6 @@ class DatasourceOut(MongoBaseModel):
     data_src_name: str
     fields: List[str]
     org_id: str
+
+class DatasourceFields(MongoBaseModel):
+    fields: List[str]
