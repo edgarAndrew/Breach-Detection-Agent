@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-import asyncio
 import logging
 from app.rule_engine import process_event
 from pathlib import Path

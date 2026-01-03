@@ -5,7 +5,6 @@ from app.rule_cache import rule_refresh_worker
 from app.rule_engine import process_event
 from Redis.client import RedisPubSubClient
 from Redis.queues import RAWEVENTS_QUEUE
-import sys
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("rule-engine-worker")
