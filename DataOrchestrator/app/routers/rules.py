@@ -35,9 +35,9 @@ async def delete_rule(rule_id: str, controller=Depends(get_controller)):
 async def pdf_to_json(file: UploadFile = File(...), controller=Depends(get_controller), user_id: str = Depends(verify_token)):
     return await controller.convert_to_config(file, user_id)
 
-@router.get("/events/{rule_id}")
+@router.get("/events")
 async def get_events_by_rule_and_time_range(
-    rule_id: str,
+    rule_id: str = Query(..., description="Rule ID"),
     start_ts: float = Query(..., description="Start timestamp (epoch)"),
     end_ts: float = Query(..., description="End timestamp (epoch)"),
     controller=Depends(get_controller),

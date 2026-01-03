@@ -170,6 +170,11 @@ class RuleController:
             )
         
     async def get_events_by_rule_and_time_range(self,rule_id: str,start_ts: float,end_ts: float):
+        if start_ts > end_ts:
+            raise HTTPException(
+                status_code=400,detail="start_ts must be less than or equal to end_ts",
+            )
+        
         data_src_id = await self.repo.get_data_source_id_from_rule_id(rule_id)
         if not data_src_id:
             raise HTTPException(404, "Rule not found")
@@ -178,8 +183,16 @@ class RuleController:
         if not webhook_id:
             raise HTTPException(404, "Datasource not found")
         
-        return await self.raweventRepo.get_by_webhook_and_time_range(webhook_id,start_ts,end_ts)
+        if not await self.raweventRepo.webhook_exists(webhook_id):
+            raise HTTPException(404, "Webhook not found")
+        
+        rawevents = await self.raweventRepo.get_by_webhook_and_time_range(webhook_id,start_ts,end_ts)
 
+        return {
+            "rule_id": rule_id,
+            "rawevents": rawevents,
+        }
+    
     async def get_by_id(self, rule_id: str):
         if not await self.repo.get_by_id(rule_id):
             raise HTTPException(404, "Rule not found")

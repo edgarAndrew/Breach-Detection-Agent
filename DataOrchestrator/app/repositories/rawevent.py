@@ -37,4 +37,26 @@ class RawEventRepository:
             }
         )
 
-        return [doc async for doc in cursor]
+        events = []
+        async for doc in cursor:
+            doc["_id"] = str(doc["_id"])
+            events.append(doc)
+
+        return events
+    
+    async def get_events_for_webhook(self, webhook_id: str):
+        """
+        Get all raw events for a webhook (no time filtering).
+        """
+        cursor = self.col.find(
+            {
+                "webhook_id": webhook_id,
+            }
+        )
+
+        events = []
+        async for doc in cursor:
+            doc["_id"] = str(doc["_id"])
+            events.append(doc)
+
+        return events
