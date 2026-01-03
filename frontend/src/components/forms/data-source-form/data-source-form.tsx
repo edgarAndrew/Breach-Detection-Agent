@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form"
@@ -67,12 +67,12 @@ function DataSourceForm({ submitLabel }: { submitLabel: string }) {
     function next() {
         form.trigger(["data_src_name"]).then(async (ok) => {
             if (ok) {
-                const response = await addOrg({ org_name: form.getValues("data_src_name")})
+                const response = await addOrg({ org_name: form.getValues("data_src_name") })
                 if (response.status !== 201) {
                     toast.error("Failed to create organization. Please try again.")
                     return
                 }
-                else{
+                else {
                     useOrg.getState().setOrg(response.data._id)
                     toast.success("Organization created successfully!")
                 }
@@ -81,9 +81,11 @@ function DataSourceForm({ submitLabel }: { submitLabel: string }) {
         })
     }
 
-    if (!isAuthenticated){
-        router.replace('/auth/signin')    
-    }
+    useEffect(() => {
+        if (!isAuthenticated) {
+            router.replace('/auth/signin')
+        }
+    }, [isAuthenticated, router])
 
     return (
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" >

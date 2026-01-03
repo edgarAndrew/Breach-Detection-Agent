@@ -42,11 +42,11 @@ const navigationItems = [
     {
         heading: "Insights",
         items: [
-            {
-                title: "Trend reports",
-                url: "/reports/trends",
-                icon: TrendingUp,
-            },
+            // {
+            //     title: "Trend reports",
+            //     url: "/reports/trends",
+            //     icon: TrendingUp,
+            // },
             {
                 title: "Alerts",
                 url: "/alerts",

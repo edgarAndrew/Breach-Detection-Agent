@@ -1,5 +1,5 @@
 'use client'
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -45,10 +45,12 @@ function SignInForm() {
         }
     }
 
-    if (isAuthenticated) {
-        router.replace('/dashboard')
-        return null
-    }
+    useEffect(() => {
+        if (isAuthenticated) {
+            router.replace('/dashboard')
+        }
+    }, [isAuthenticated, router])
+
 
     return (
         <Card className="w-full max-w-sm border-muted/40 shadow-xl backdrop-blur supports-backdrop-filter:bg-background/80">
