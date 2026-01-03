@@ -7,6 +7,7 @@ import sys
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 from Redis.client import RedisPubSubClient
 from Redis.queues import RAWEVENTS_QUEUE
+from app.routers import health
 
 
 logging.basicConfig(level=logging.INFO)
@@ -23,9 +24,4 @@ async def start_redis_listener():
     await client.subscribe(RAWEVENTS_QUEUE, process_event)
     logger.info("Subscribed to RAWEVENTS_QUEUE")
 
-# -------------------------
-# Health endpoint
-# -------------------------
-@app.get("/health")
-async def health():
-    return {"status": "ok"}
+app.include_router(health.router)

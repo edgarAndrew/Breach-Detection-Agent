@@ -7,7 +7,7 @@ from Redis.queues import RAWEVENTS_QUEUE
 
 ORG_EVENTS = [
     {
-        "org_id": "os-comp",
+        "org_id": "69592f7bcecd5c6dfe891076",
         "payload": {
             "open_price": 152.3,
             "close_price": 156.0,   # triggers gte close_price rule
@@ -17,7 +17,7 @@ ORG_EVENTS = [
         }
     },
     {
-        "org_id": "os-comp",
+        "org_id": "69592f7bcecd5c6dfe891076",
         "payload": {
             "open_price": 140.0,
             "close_price": 145.0,
@@ -27,7 +27,7 @@ ORG_EVENTS = [
         }
     },
     {
-        "org_id": "os-comp",
+        "org_id": "69592f7bcecd5c6dfe891076",
         "payload": {
             "open_price": 140.0,
             "close_price": 145.0,
@@ -37,7 +37,7 @@ ORG_EVENTS = [
         }
     },
     {
-        "org_id": "os-comp",
+        "org_id": "69592f7bcecd5c6dfe891076",
         "payload": {
             "open_price": 140.0,
             "close_price": 145.0,
@@ -47,7 +47,7 @@ ORG_EVENTS = [
         }
     },
     {
-        "org_id": "os-comp",
+        "org_id": "69592f7bcecd5c6dfe891076",
         "payload": {
             "open_price": 140.0,
             "close_price": 145.0,
@@ -67,7 +67,7 @@ async def main():
         event = {
             "event_id": f"evt-{uuid.uuid4().hex[:8]}",
             "webhook_id": f"whk-{uuid.uuid4().hex[:8]}",
-            "rule_id": "rule_001",
+            "rule_id": "6959673750d49d804ae16c5a",
             "org_id": org_event["org_id"],
             "payload": {
                 **org_event["payload"],

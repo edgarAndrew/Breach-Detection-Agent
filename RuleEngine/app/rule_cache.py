@@ -19,7 +19,7 @@ RULE_REFRESH_INTERVAL = 60  # seconds
 class Rule(BaseModel):
     id: str | None = Field(alias="_id")
     rule_name: str
-    rule_id: str
+    # rule_id: str
     data_src_id: str
     org_id: str
     attribute_name: str
@@ -54,7 +54,7 @@ async def fetch_all_rules() -> Dict[str, List[Rule]]:
                 rule = Rule(
                     id=r.get("_id"),
                     rule_name=r["rule_name"],
-                    rule_id=r["rule_id"],
+                    # rule_id=r["rule_id"],
                     data_src_id=r["data_src_id"],
                     org_id=r["org_id"],
                     attribute_name=r["attribute_name"],
