@@ -14,7 +14,7 @@ import { RULE_OPERATORS } from "@/constants/rules"
 import { createRule } from "@/lib/api/rule"
 import { toast } from "sonner"
 import { getOrgFields } from "@/lib/api/datasource"
-
+import { convertRulePDFtoJSON } from "@/lib/api/rule"
 
 function AddRuleForm() {
     const [importOpen, setImportOpen] = useState(false)
@@ -22,6 +22,7 @@ function AddRuleForm() {
     const [importError, setImportError] = useState<string | null>(null)
     const [importing, setImporting] = useState(false)
     const [metricOptions, setMetricOptions] = useState<string[]>([])
+    const [importType, setImportType] = useState<'json' | 'pdf' | null>(null)
 
     useEffect(() => {
         async function fetchMetrics() {
@@ -53,23 +54,73 @@ function AddRuleForm() {
         name: "rules",
     })
 
+    const response_to_ui_fields = (
+        rulesArray: Array<{
+            attribute_name: string;
+            threshold: number;
+            near_thres: number;
+            operator: string; // e.g., "gt", "lt", etc.
+        }>
+        ) => {
+            console.log("Received data for UI conversion:", rulesArray);
+
+            // Map API fields to form field names
+            const mappedRules = rulesArray.map(rule => ({
+                field: rule.attribute_name,
+                operator: rule.operator,
+                threshold: rule.threshold,
+                near_thres: rule.near_thres,
+            }));
+
+            console.log("Got the output from the  reposne to ui fileds ", mappedRules)
+            fields.forEach((_, index) => remove(index));
+            console.log("Updated the fields")
+            mappedRules.forEach(rule => append(rule));
+
+            return mappedRules;
+        };
+   
+
     async function handleImportSubmit() {
-        if (!importFile) {
-            setImportError("Please select a file")
-            return
-        }
+        // if (!importFile) {
+        //     setImportError("Please select a file")
+        //     return
+        // }
 
         setImportError(null)
         setImporting(true)
 
-        const body = new FormData()
-        body.append("file", importFile)
-
         try {
-            // TODO: Call bulk import
-            setImportOpen(false)
-            setImportFile(null)
-        } catch {
+            if (importType === 'json') {
+                const reader = new FileReader()
+                reader.onload = (e) => {
+                    try {
+                        const jsonContent = JSON.parse(e.target?.result as string)
+                        response_to_ui_fields(jsonContent)
+                        setImportOpen(false)
+                        setImportFile(null)
+                    } catch (err) {
+                        setImportError("Invalid JSON file")
+                    } finally {
+                        setImporting(false)
+                    }
+                }
+                reader.readAsText(importFile)
+            } else if (importType === 'pdf') {
+                
+                const formData = new FormData()
+                formData.append("file", importFile)
+                const response = await convertRulePDFtoJSON(formData);
+                
+                const rulesArray = response.data.rules;
+                response_to_ui_fields(rulesArray);
+                
+                console.log("Added the new rules")
+                setImportOpen(false)
+                setImportFile(null)
+            }
+        } catch (err) {
+            console.error(err)
             setImportError("Upload failed")
         } finally {
             setImporting(false)
@@ -103,9 +154,20 @@ function AddRuleForm() {
                         </CardDescription>
                     </div>
 
-                    <Button variant="outline" onClick={() => setImportOpen(true)}>
-                        Import rules
-                    </Button>
+                    <div className="flex gap-2">
+                        <Button variant="outline" onClick={() => {
+                            setImportType('json')
+                            setImportOpen(true)
+                        }}>
+                            Import from Config
+                        </Button>
+                        <Button variant="outline" onClick={() => {
+                            setImportType('pdf')
+                            setImportOpen(true)
+                        }}>
+                            Import from PDF
+                        </Button>
+                    </div>
                 </CardHeader>
 
                 <CardContent className="space-y-4">
@@ -217,13 +279,26 @@ function AddRuleForm() {
                 </CardContent>
             </Card>
 
-            <Dialog open={importOpen} onOpenChange={setImportOpen}>
+            <Dialog open={importOpen} onOpenChange={(open) => {
+                if (!open) {
+                    setImportFile(null)
+                    setImportError(null)
+                    setImportType(null)
+                }
+                setImportOpen(open)
+            }}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Import rules</DialogTitle>
+                        <DialogTitle>
+                            {importType === 'pdf' ? 'Import from PDF' : 'Import from Config'}
+                        </DialogTitle>
                     </DialogHeader>
                     <div className="space-y-3">
-                        <Input type="file" accept=".csv,.xlsx,.json" onChange={(e) => setImportFile(e.target.files?.[0] ?? null)} />
+                        <Input 
+                            type="file" 
+                            accept={importType === 'pdf' ? ".pdf" : ".json"} 
+                            onChange={(e) => setImportFile(e.target.files?.[0] ?? null)} 
+                        />
 
                         {importError && (
                             <p className="text-sm text-red-500">{importError}</p>
@@ -234,7 +309,7 @@ function AddRuleForm() {
                                 Cancel
                             </Button>
                             <Button onClick={handleImportSubmit} disabled={importing}>
-                                Import
+                                {importing ? 'Processing...' : 'Import'}
                             </Button>
                         </div>
                     </div>

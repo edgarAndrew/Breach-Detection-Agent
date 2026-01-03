@@ -1,4 +1,4 @@
-import apiClient from "../http/client"
+import apiClient, {apiClientFile} from "../http/client"
 import { RulesData } from "@/schema/rule/rules.schema"
 
 export function getOrgRules() {
@@ -16,4 +16,10 @@ export function deleteRule(id: string) {
 
 export function getRuleById(id: string) {
     return apiClient.get(`/api/rules/${id}`)
+}
+
+export function convertRulePDFtoJSON(payload: FormData) {
+    console.log("Sending FormData:", payload);
+    console.log("File in FormData:", payload.get("file"));
+    return apiClientFile.post(`/api/rules/pdf-to-json`, payload);
 }
