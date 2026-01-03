@@ -1,0 +1,1 @@
+export const INLINE_EDIT_LIMIT = 10 // UI behaviour threshold to avoid scroll behaviour
