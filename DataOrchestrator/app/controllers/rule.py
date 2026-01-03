@@ -3,6 +3,7 @@ from app.repositories.rule import RuleRepository
 from app.repositories.webhook import WebhookRepository
 from app.repositories.rawevent import RawEventRepository
 from app.routers.utils import normalize
+from app.controllers.user import UserController
 from fastapi.responses import JSONResponse
 from groq import Groq
 import PyPDF2
@@ -59,11 +60,20 @@ class RuleController:
         self.repo = RuleRepository(db)
         self.webhookRepo = WebhookRepository(db)
         self.raweventRepo = RawEventRepository(db)
+        self.userController = UserController(db)
 
-    async def create(self, payload):
-        if not await self.repo.datasource_exists(payload.data_src_id):
+    async def create(self, payload, user_id):
+        col_ids = self.userController.get_data_src(user_id)
+        datasource_id = col_ids["datasource_id"]
+        org_id = col_ids["org_id"]
+        if not await self.repo.datasource_exists(datasource_id):
             raise HTTPException(404, "Datasource not found")
-        return normalize(await self.repo.create(payload.dict()))
+        
+        payload = [
+            {**p, "data_src_id": datasource_id, "org_id": org_id}
+            for p in payload
+        ]
+        return normalize(await self.repo.create(payload))
 
     async def list(self):
         return [normalize(r) for r in await self.repo.list()]

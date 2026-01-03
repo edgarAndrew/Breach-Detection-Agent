@@ -7,7 +7,7 @@ export function getOrgRules() {
 }
 
 export function createRule(payload: RulesData) {
-    return apiClient.post("/api/rules", payload)
+    return apiClient.post("/api/rules", payload['rules'])
 }
 
 export function deleteRule(id: string) {

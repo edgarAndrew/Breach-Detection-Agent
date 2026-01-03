@@ -64,4 +64,4 @@ class UserController:
         if not datasource_id:
             raise HTTPException(status_code=404, detail="Datasource not found")
         
-        return {"datasource_id": datasource_id}
+        return {"datasource_id": datasource_id, "org_id": org_id}

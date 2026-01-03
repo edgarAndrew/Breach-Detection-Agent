@@ -11,8 +11,14 @@ class RuleRepository:
         return await self.ds.find_one({"_id": ObjectId(id)})
 
     async def create(self, data):
-        res = await self.col.insert_one(data)
-        return await self.col.find_one({"_id": res.inserted_id})
+        if isinstance(data, dict):
+            res = await self.col.insert_one(data)
+            return await self.col.find_one({"_id": res.inserted_id})
+
+        if isinstance(data, list):
+            res = await self.col.insert_many(data)
+            cursor = self.col.find({"_id": {"$in": res.inserted_ids}})
+            return await cursor.to_list(length=len(res.inserted_ids))
 
     async def list(self):
         return [r async for r in self.col.find()]

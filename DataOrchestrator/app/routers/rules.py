@@ -10,12 +10,13 @@ router = APIRouter(tags=["Rules"])
 def get_controller(db=Depends(get_database)):
     return RuleController(db)
 
-@router.post("", response_model=RuleOut, status_code=201)
+@router.post("/create", status_code=201)
 async def create_rule(
-    payload: RuleCreate,
+    payload,
     controller=Depends(get_controller),
+    user_id: str = Depends(verify_token)
 ):
-    return await controller.create(payload)
+    return await controller.create(payload, user_id)
 
 @router.get("", response_model=list[RuleOut])
 async def list_rules(controller=Depends(get_controller)):

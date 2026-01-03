@@ -40,7 +40,8 @@ function AddRuleForm() {
         defaultValues: {
             rules: [
                 {
-                    field: "",
+                    rule_name: "",
+                    attribute_name: "",
                     operator: "gt",
                     threshold: 0,
                     near_thres: 0,
@@ -66,7 +67,7 @@ function AddRuleForm() {
 
             // Map API fields to form field names
             const mappedRules = rulesArray.map(rule => ({
-                field: rule.attribute_name,
+                attribute_name: rule.attribute_name,
                 operator: rule.operator,
                 threshold: rule.threshold,
                 near_thres: rule.near_thres,
@@ -75,6 +76,7 @@ function AddRuleForm() {
             console.log("Got the output from the  reposne to ui fileds ", mappedRules)
             fields.forEach((_, index) => remove(index));
             console.log("Updated the fields")
+            // @ts-ignore
             mappedRules.forEach(rule => append(rule));
 
             return mappedRules;
@@ -105,10 +107,12 @@ function AddRuleForm() {
                         setImporting(false)
                     }
                 }
+                // @ts-ignore
                 reader.readAsText(importFile)
             } else if (importType === 'pdf') {
                 
                 const formData = new FormData()
+                // @ts-ignore
                 formData.append("file", importFile)
                 const response = await convertRulePDFtoJSON(formData);
                 
@@ -129,6 +133,8 @@ function AddRuleForm() {
 
     async function onSubmit(data: RulesData) {
         try {
+            console.log("Final data")
+            console.log(data)
             const response = await createRule(data)
             if (response.status !== 201) {
                 toast.error("Failed to create rules. Please try again.")
@@ -186,7 +192,21 @@ function AddRuleForm() {
                                     <span className="text-sm text-muted-foreground md:col-span-1">If</span>
                                     <div className="md:col-span-2">
                                         <Controller
-                                            name={`rules.${index}.field`}
+                                            name={`rules.${index}.rule_name`}
+                                            control={form.control}
+                                            render={({ field }) => (
+                                                <Input
+                                                    {...field}
+                                                    id={`rule-name-${index}`}
+                                                    placeholder="Rule Name"
+                                                    required
+                                                />
+                                            )}
+                                        />
+                                        </div>
+                                    <div className="md:col-span-2">
+                                        <Controller
+                                            name={`rules.${index}.attribute_name`}
                                             control={form.control}
                                             render={({ field }) => (
                                                 <Select value={field.value} onValueChange={field.onChange}>
@@ -267,7 +287,7 @@ function AddRuleForm() {
 
                         <div className="flex justify-between pt-2">
                             <Button type="button" variant="secondary" disabled={!form.formState.isValid || !!form.formState.errors.rules}
-                                onClick={() => append({ field: "", operator: "gt", threshold: 1.2, near_thres: 0.5 })}>
+                                onClick={() => append({rule_name:"", attribute_name: "", operator: "gt", threshold: 1.2, near_thres: 0.5 })}>
                                 Add rule
                             </Button>
 
