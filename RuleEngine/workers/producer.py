@@ -4,6 +4,7 @@ import uuid
 from Redis.client import RedisPubSubClient
 from Redis.queues import RAWEVENTS_QUEUE
 
+
 ORG_EVENTS = [
     {
         "org_id": "os-comp",

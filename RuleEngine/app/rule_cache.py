@@ -1,3 +1,4 @@
+# rule_cache.py
 import asyncio
 import logging
 from typing import Dict, List
@@ -28,7 +29,6 @@ class Rule(BaseModel):
 # -------------------------
 RULE_CACHE: Dict[str, List[Rule]] = {}
 
-
 # -------------------------
 # Fetch rules from service
 # -------------------------
@@ -56,21 +56,18 @@ async def fetch_all_rules() -> Dict[str, List[Rule]]:
 
             return cache
 
-
 # -------------------------
 # Background refresher
 # -------------------------
 async def rule_refresh_worker():
-    global RULE_CACHE
-
+    """Continuously refresh RULE_CACHE in-place."""
     while True:
         try:
             logger.info("Refreshing rules from Rule Service...")
-            RULE_CACHE = await fetch_all_rules()
-            logger.info(
-                "Rules refreshed successfully. Orgs loaded: %s",
-                list(RULE_CACHE.keys())
-            )
+            new_cache = await fetch_all_rules()
+            RULE_CACHE.clear()
+            RULE_CACHE.update(new_cache)
+            logger.info("Rules refreshed successfully. Orgs loaded: %s", list(RULE_CACHE.keys()))
         except Exception:
             logger.exception("Failed to refresh rules")
 

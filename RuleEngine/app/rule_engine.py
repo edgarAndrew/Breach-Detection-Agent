@@ -1,3 +1,4 @@
+# rule_engine.py
 import json
 from datetime import datetime
 from typing import Literal
@@ -7,11 +8,11 @@ import logging
 import sys
 from pathlib import Path
 
-sys.path.append(str(Path(__file__).resolve().parents[2]))
+from app.rule_cache import RULE_CACHE, Rule
 
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 from Redis.client import RedisPubSubClient
 from Redis.queues import ALERTS_QUEUE
-from RuleEngine.app.rule_cache import RULE_CACHE, rule_refresh_worker, Rule
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -25,7 +26,6 @@ class RawEvent(BaseModel):
     org_id: str
     payload: dict
     send_at: str
-
 
 # -------------------------
 # Evaluation function
@@ -66,11 +66,11 @@ def evaluate(value: float, rule: Rule) -> str:
 
     return "SAFE"
 
-
 # -------------------------
 # Rule engine handler
 # -------------------------
 async def process_event(message: str):
+    """Consume Redis message, evaluate rules, publish alerts."""
     try:
         event = RawEvent.parse_raw(message)
         client = RedisPubSubClient()
@@ -119,11 +119,3 @@ async def process_event(message: str):
 
     except Exception:
         logger.exception("Error processing event")
-
-
-# -------------------------
-# Startup hook (run once)
-# -------------------------
-async def startup():
-    print("fetching the rules")
-    asyncio.create_task(rule_refresh_worker())

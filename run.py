@@ -40,15 +40,19 @@ def start_service(name: str, cwd: Path, port: int):
 
 def start_rule_engine_worker():
     print("Starting Rule Engine Worker...")
+
+    env = os.environ.copy()
+    env["PYTHONPATH"] = str(BASE_DIR)  # 👈 project root
+
     return subprocess.Popen(
         [
             sys.executable,
             "-m",
-            "RuleEngine.app.rule_engine_worker"
+            "app.rule_engine_worker"
         ],
-        cwd=BASE_DIR,
+        cwd=RULE_ENGINE_DIR,
+        env=env,
     )
-
 
 
 def start_data_orchestrator():
