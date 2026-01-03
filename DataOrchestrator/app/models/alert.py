@@ -21,6 +21,7 @@ class AlertCreate(BaseModel):
 
     insights: Dict[str, Any] = Field(default_factory=dict)
     created_at: datetime = Field(default_factory=datetime.utcnow)
+    email_sent: bool = Field(default=False)
 
 
 class AlertOut(MongoBaseModel):
@@ -40,3 +41,4 @@ class AlertOut(MongoBaseModel):
 
     insights: Dict[str, Any]
     created_at: datetime
+    email_sent: bool

@@ -40,6 +40,7 @@ def make_alert_handler(batch_writer):
             "current_value": alert.current_value,
             "threshold": alert.threshold,
             "message": alert.message,
+            "email_sent": alert.email_sent,
             "ingested_at": time.time(),
         }
 

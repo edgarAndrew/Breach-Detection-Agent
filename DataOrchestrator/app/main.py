@@ -47,9 +47,13 @@ async def startup():
     raw_repo = RawEventRepository(db)
     alert_repo = AlertRepository(db)
 
-    # batch writers (same class)
+    # batch writers
     app.state.raw_batch = BatchWriter(repo=raw_repo, interval=os.getenv("DB_FLUSH_INTERVAL", 5.0))
     app.state.alert_batch = BatchWriter(repo=alert_repo, interval=os.getenv("DB_FLUSH_INTERVAL", 5.0))
+
+    # start batch writers
+    await app.state.raw_batch.start()
+    await app.state.alert_batch.start()
 
     # consumers
     await start_raw_event_consumer(redis_client, app.state.raw_batch,RAWEVENTS_QUEUE)
@@ -57,12 +61,12 @@ async def startup():
 
 @app.on_event("shutdown")
 async def shutdown():
-    # Flush all batch writers
+    # Stop batch writers
     if hasattr(app.state, "raw_batch"):
-        await app.state.raw_batch.flush()
+        await app.state.raw_batch.stop()
 
     if hasattr(app.state, "alert_batch"):
-        await app.state.alert_batch.flush()
+        await app.state.alert_batch.stop()
 
     # close redis
     if hasattr(app.state, "redis_client"):

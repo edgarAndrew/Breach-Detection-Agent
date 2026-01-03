@@ -9,7 +9,7 @@ class BatchWriter:
         interval: float = 3.0,  # seconds
     ):
         self.repo = repo
-        self.interval = interval
+        self.interval = float(interval)
 
         self._buffer: List[Dict[str, Any]] = []
         self._lock = asyncio.Lock()
