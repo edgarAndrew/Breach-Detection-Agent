@@ -34,9 +34,9 @@ class TrendsRepository:
                         }
                     ],
                     "latest": [
-                        {"$sort": {"created_at": -1}},
+                        {"$sort": {"ingested_at": -1}},
                         {"$limit": 1},
-                        {"$project": {"_id": 0, "created_at": 1}}
+                        {"$project": {"_id": 0, "ingested_at": 1}}
                     ]
                 }
             }
@@ -63,7 +63,7 @@ class TrendsRepository:
                 for r in data["by_rule"]
             ],
             "latest_alert_at": (
-                data["latest"][0]["created_at"]
+                data["latest"][0]["ingested_at"]
                 if data["latest"] else None
             )
         }
@@ -76,11 +76,11 @@ class TrendsRepository:
             {"org_id": org_id, "rule_id": rule_id},
             {
                 "_id": 0,
-                "created_at": 1,
+                "ingested_at": 1,
                 "current_value": 1,
                 "threshold": 1
             }
-        ).sort("created_at", 1)
+        ).sort("ingested_at", 1)
 
         rows = await cursor.to_list(length=None)
         if not rows:
@@ -95,7 +95,7 @@ class TrendsRepository:
             "threshold": threshold,
             "trend": [
                 {
-                    "timestamp": r["created_at"],
+                    "timestamp": r["ingested_at"],
                     "value": r["current_value"]
                 }
                 for r in rows

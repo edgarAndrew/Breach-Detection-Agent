@@ -7,6 +7,7 @@ class RuleCreate(BaseModel):
     rule_id: str
     data_src_id: str
     org_id: str
+    attribute_name: str
     threshold: float
     near_thres: float = 0.0
     operator: str  # gt | lt | gte | lte | eq
@@ -16,6 +17,7 @@ class RuleOut(MongoBaseModel):
     rule_id: str
     data_src_id: str
     org_id: str
+    attribute_name:str
     threshold: float
     near_thres: float
     operator: str

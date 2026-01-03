@@ -38,6 +38,18 @@ def start_service(name: str, cwd: Path, port: int):
         cwd=cwd,
     )
 
+def start_rule_engine_worker():
+    print("Starting Rule Engine Worker...")
+    return subprocess.Popen(
+        [
+            sys.executable,
+            "-m",
+            "RuleEngine.app.rule_engine_worker"
+        ],
+        cwd=BASE_DIR,
+    )
+
+
 
 def start_data_orchestrator():
     return start_service("Data Orchestrator",DATA_ORCHESTRATOR_DIR,DATA_ORCHESTRATOR_PORT)
@@ -55,6 +67,7 @@ def start_webhook_service():
 # Control which services run here
 ENABLED_SERVICES = [
     start_data_orchestrator,
+    start_rule_engine_worker,
     start_rule_engine,
     start_validation_service,
     start_webhook_service,
