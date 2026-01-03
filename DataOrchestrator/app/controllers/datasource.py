@@ -16,3 +16,7 @@ class DatasourceController:
     async def list_datasources(self):
         docs = await self.repo.list()
         return [normalize(d) for d in docs]
+
+    async def get_fields(self, user_id):
+        return await self.repo.get_fields(user_id)
+    
