@@ -2,7 +2,7 @@ import { z } from "zod"
 
 const ruleSchema = z.object({
     field: z.string().min(1),
-    operator: z.enum([">", "<", ">=", "<=", "="], "Operator is required"),
+    operator: z.enum(["gt", "lt", "gte", "lte", "eq"], "Operator is required"),
     threshold: z.number(),
     near_thres: z.number().min(0, "Near threshold percentage must be between 0 and 100").max(100, "Near threshold percentage must be between 0 and 100"),
 })

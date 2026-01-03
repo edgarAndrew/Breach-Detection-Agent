@@ -41,7 +41,7 @@ function AddRuleForm() {
             rules: [
                 {
                     field: "",
-                    operator: ">",
+                    operator: "gt",
                     threshold: 0,
                     near_thres: 0,
                 },
@@ -267,7 +267,7 @@ function AddRuleForm() {
 
                         <div className="flex justify-between pt-2">
                             <Button type="button" variant="secondary" disabled={!form.formState.isValid || !!form.formState.errors.rules}
-                                onClick={() => append({ field: "", operator: ">", threshold: 1.2, near_thres: 0.5 })}>
+                                onClick={() => append({ field: "", operator: "gt", threshold: 1.2, near_thres: 0.5 })}>
                                 Add rule
                             </Button>
 
