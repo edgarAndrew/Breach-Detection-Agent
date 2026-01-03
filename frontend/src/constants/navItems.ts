@@ -52,11 +52,11 @@ const navigationItems = [
                 url: "/alerts",
                 icon: Bell,
             },
-            {
-                title: "Historical data",
-                url: "/historical-upload",
-                icon: Upload,
-            },
+            // {
+            //     title: "Historical data",
+            //     url: "/historical-upload",
+            //     icon: Upload,
+            // },
         ],
     },
 ] 

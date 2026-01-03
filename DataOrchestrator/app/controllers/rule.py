@@ -179,3 +179,8 @@ class RuleController:
             raise HTTPException(404, "Datasource not found")
         
         return await self.raweventRepo.get_by_webhook_and_time_range(webhook_id,start_ts,end_ts)
+
+    async def get_by_id(self, rule_id: str):
+        if not await self.repo.get_by_id(rule_id):
+            raise HTTPException(404, "Rule not found")
+        return normalize(await self.repo.get_by_id(rule_id))

@@ -35,3 +35,6 @@ class RuleRepository:
         if not rule:
             return None
         return rule.get("data_src_id")
+
+    async def get_by_id(self, rule_id: str):
+        return await self.col.find_one({"_id": ObjectId(rule_id)})

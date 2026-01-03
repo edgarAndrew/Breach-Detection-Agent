@@ -1,45 +1,52 @@
-import { Metadata } from "next"
-import { notFound } from "next/navigation"
+// import { Metadata } from "next"
+'use client'
 import RuleDetails from "@/components/rules/rule-details"
 import Rule from "@/types/rule"
+import { getRuleById } from "@/lib/api/rule";
+import { getOrgDetailsByUserId } from "@/lib/api/org";
+import { getOrgRulesTrend } from "@/lib/api/trends";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import TrendData from "@/types/trendData";
 
-export const metadata: Metadata = {
-    title: "Rule Details",
-    description: "View rule configuration, execution results, and insights."
-}
+// export const metadata: Metadata = {
+//     title: "Rule Details",
+//     description: "View rule configuration, execution results, and insights."
+// }
 
-async function fetchRule(id: string): Promise<Rule | null> {
-    return {
-        _id: id,
-        rule_name: "High CPU Usage",
-        rule_id: "RULE-12345",
-        data_src_id: "DS-67890",
-        attribute_name: "cpu_usage",
-        threshold: 80,
-        near_thres: 5,
-        operator: "gt",
-    }
-}
-async function fetchRuleData(id: string) {
-    console.log(id)
-    return Array.from({ length: 24 }).map((_, i) => ({
-        timestamp: `T-${24 - i}h`,
-        value: 40 + Math.random() * 50,
-    }))
-}
+function RuleDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+    const [rule, setRule] = useState<Rule | null>(null);
+    const [trendData, setTrendData] = useState<TrendData | null>(null);
 
-async function RuleDetailsPage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = await params;
-    const rule = await fetchRule(id)
-    const data = await fetchRuleData(id)
+    useEffect(() => {
+        async function fetchData() {
+            const { id } = await params;
+            const response = await getRuleById(id);
+            setRule(response.data);
+            if (response.status !== 200 || !response.data) {
+                toast.error("Failed to fetch rule details.");
+                return;
+            }
+            const orgResponse = await getOrgDetailsByUserId();
+            if (orgResponse.status != 200 || !orgResponse.data) {
+                toast.error("Failed to fetch organization details.");
+                return;
+            }
+            // const trendResponse = await getOrgRulesTrend(id, orgResponse.data.org_id);
+            const trendResponse = await getOrgRulesTrend('rule_001', 'os-comp');
+            if (trendResponse.status != 200 || !trendResponse.data) {
+                toast.error("Failed to fetch trend data.");
+                return;
+            }
+            setTrendData(trendResponse.data);
 
-    if (!rule || !data) {
-        notFound()
-    }
+        }
+        fetchData();
+    }, [params]);
 
     return (
         <main className="mx-auto w-full max-w-5xl px-4 space-y-8">
-            <RuleDetails rule={rule} data={data} />
+            {rule && trendData && <RuleDetails rule={rule} data={trendData} />}
         </main>
     )
 }

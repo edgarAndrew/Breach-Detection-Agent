@@ -45,3 +45,8 @@ async def get_events_by_rule_and_time_range(
     return await controller.get_events_by_rule_and_time_range(
         rule_id, start_ts, end_ts
     )
+
+@router.get("/{rule_id}", response_model=RuleOut)
+async def get_rule_by_id(rule_id: str, controller=Depends(get_controller)):
+    """Get a rule by its ID."""
+    return await controller.get_by_id(rule_id)

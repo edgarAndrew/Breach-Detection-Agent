@@ -113,7 +113,7 @@ function RuleTable() {
           ) : (
             pageRules.map((rule) => (
               <TableRow key={rule._id}>
-                <TableCell className="text-base font-medium leading-relaxed">{rule.rule_id}</TableCell>
+                <TableCell className="text-base font-medium leading-relaxed">{rule._id}</TableCell>
                 <TableCell className="text-base font-medium leading-relaxed">{rule.rule_name}</TableCell>
                 <TableCell className="text-base font-medium leading-relaxed">
                   {formatRule(rule)}

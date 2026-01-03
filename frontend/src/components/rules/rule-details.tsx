@@ -3,13 +3,13 @@
 import Rule from "@/types/rule"
 import { Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import RuleInsights from "./rule-insights"
 import RuleGraph from "./rule-graph"
 import { getOperatorText } from "@/lib/rule"
+import TrendData from "@/types/trendData"
 
 type Props = {
     rule: Rule
-    data: { timestamp: string; value: number }[]
+    data: TrendData
 }
 
 function RuleDetails({ rule, data }: Props) {
@@ -34,8 +34,7 @@ function RuleDetails({ rule, data }: Props) {
                     Run rule
                 </Button>
             </header>
-            <RuleGraph data={data} threshold={rule.threshold} />
-            <RuleInsights rule={rule} data={data} />
+            <RuleGraph data={data.trend} threshold={data.threshold} health={data.health}/>
         </section>
     )
 }
