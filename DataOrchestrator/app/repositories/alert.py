@@ -40,3 +40,6 @@ class AlertRepository:
             "email_sent": False
         })
         return [a async for a in cursor]
+
+    async def list_by_org(self, org_id: str):
+        return [a async for a in self.col.find({"org_id": org_id})]

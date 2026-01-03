@@ -42,3 +42,6 @@ class AlertController:
             normalized_alerts.append(alert)
 
         return normalized_alerts
+
+    async def list_by_org(self, org_id: str):
+        return [normalize(a) for a in await self.repo.list_by_org(org_id)]
