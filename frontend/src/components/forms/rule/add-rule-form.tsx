@@ -57,6 +57,7 @@ function AddRuleForm() {
 
     const response_to_ui_fields = (
         rulesArray: Array<{
+            rule_name: string;
             attribute_name: string;
             threshold: number;
             near_thres: number;
@@ -67,6 +68,7 @@ function AddRuleForm() {
 
             // Map API fields to form field names
             const mappedRules = rulesArray.map(rule => ({
+                rule_name: rule.rule_name,
                 attribute_name: rule.attribute_name,
                 operator: rule.operator,
                 threshold: rule.threshold,
