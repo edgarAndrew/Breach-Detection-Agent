@@ -1,0 +1,37 @@
+[
+  {
+    "rule_name": "Revenue Growth Check",
+    "attribute_name": "growth",
+    "threshold": 5.0,
+    "near_thres": 5,
+    "operator": "lt"
+  },
+  {
+    "rule_name": "Gross Margin Check",
+    "attribute_name": "gross_margin",
+    "threshold": 45.0,
+    "near_thres": 5,
+    "operator": "lt"
+  },
+  {
+    "rule_name": "Operating Cash Flow Check",
+    "attribute_name": "operating_cash_flow",
+    "threshold": 3.0,
+    "near_thres": 5,
+    "operator": "lt"
+  },
+  {
+    "rule_name": "Customer Acquisition Cost Check",
+    "attribute_name": "cac",
+    "threshold": 500,
+    "near_thres": 5,
+    "operator": "gt"
+  },
+  {
+    "rule_name": "Debt Ratio Check",
+    "attribute_name": "debt_ratio",
+    "threshold": 0.50,
+    "near_thres": 5,
+    "operator": "gt"
+  }
+]

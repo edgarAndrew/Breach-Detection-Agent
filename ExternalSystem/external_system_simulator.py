@@ -11,12 +11,15 @@ load_dotenv()
 WEBHOOK_URL = "http://localhost:8083/webhook/receive/{org_id}/{webhook_id}"
 HTTP_TIMEOUT_SECONDS = int(os.getenv("HTTP_TIMEOUT_SECONDS", 5))
 
+WEBHOOK_ID = os.getenv("COMP_TEST_WEBHOOK_ID")
+ORGANIZATION_ID = os.getenv("COMP_TEST_ORG_ID")
+
 COMPANIES = {
-    "os-comp": {
+    ORGANIZATION_ID : {
         "api_key": os.getenv("COMP_TEST_API_KEY", "Dummykey"),
-        "csv_file": os.getenv("COMP_TEST_CSV", "small_test.csv"),
+        "csv_file": os.getenv("COMP_TEST_CSV", "small_test2.csv"),
         "delay": int(os.getenv("COMP_TEST_DELAY", 2)),
-        "webhook_id": os.getenv("COMP_TEST_WEBHOOK_ID", "wbh-123")
+        "webhook_id": WEBHOOK_ID
     }
     # ,"os-comp-2": {
     #     "api_key": os.getenv("COMP_TEST_API_KEY", "Dummykey"),
