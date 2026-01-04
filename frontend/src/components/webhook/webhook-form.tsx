@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,15 +38,16 @@ export function Webhook() {
     setRawApiKey(null);
   };
 
-  const setupAutoHide = (key: string) => {
+  const setupAutoHide = useCallback((key: string) => {
     clearRawKey();
     setRawApiKey(key);
-    setApiKeyPreview(maskApiKey(key)); // also update preview for consistency
+    setApiKeyPreview(maskApiKey(key));
     hideTimer.current = setTimeout(() => {
       setRawApiKey(null);
       toast('API key hidden for security', { icon: <EyeOff className="h-4 w-4" /> });
     }, 60_000);
-  };
+  }, []);
+
 
   // Fetch or create webhook on mount
   useEffect(() => {
@@ -54,9 +55,8 @@ export function Webhook() {
       try {
         // Step 1: Try to fetch existing webhook
         const getRes = await getOrgWebhook();
-
-        if (getRes.ok) {
-          const data = await getRes.json();
+        if (getRes.status == 200) {
+          const data = getRes.data;
           // GET response has: { webhook_id, url } — NO api_key
           if (data.url) {
             setWebhookUrl(data.url);
@@ -69,9 +69,11 @@ export function Webhook() {
 
         // Step 2: If not found or invalid, create a new one
         const createRes = await createOrgWebhook();
-        if (!createRes.ok) throw new Error('Failed to create webhook');
-        const newData = await createRes.json();
+        console.log(createRes.data)
+        if (createRes.status != 201) throw new Error('Failed to create webhook');
+        const newData = createRes.data;
         // POST response has: { url, api_key }
+        console.log(newData)
         setWebhookUrl(newData.url);
         setupAutoHide(newData.api_key); // show raw key + auto-hide
         toast.success('Webhook created! Copy your API key now.');
@@ -88,15 +90,15 @@ export function Webhook() {
     return () => {
       if (hideTimer.current) clearTimeout(hideTimer.current);
     };
-  }, []);
+  }, [setupAutoHide]);
 
   // Regenerate API key
   const handleRegenerate = async () => {
     setIsLoading(true);
     try {
       const res = await regenerateWebhookApiKey();
-      if (!res.ok) throw new Error('Failed to regenerate API key');
-      const data = await res.json();
+      if (res.status !== 200) throw new Error('Failed to regenerate API key');
+      const data = await res.data;
       // Regenerate response has: { webhook_id, api_key, url }
       setWebhookUrl(data.url);
       setupAutoHide(data.api_key);

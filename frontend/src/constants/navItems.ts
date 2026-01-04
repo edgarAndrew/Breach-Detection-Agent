@@ -1,12 +1,10 @@
 import {
-    Home,
-    Database,
+    Webhook,
     ShieldCheck,
-    Upload,
-    TrendingUp,
     Bell,
     PlusCircle,
 } from "lucide-react"
+
 
 const navigationItems = [
     // {
@@ -57,6 +55,11 @@ const navigationItems = [
             //     url: "/historical-upload",
             //     icon: Upload,
             // },
+            {
+                title: "Add WebHook",
+                url: "/webhook",
+                icon: Webhook,
+            }
         ],
     },
 ] 
