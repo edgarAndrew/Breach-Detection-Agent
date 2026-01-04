@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 DATA_ORCHESTRATOR_SERVICE_URL = os.getenv("DATA_ORCHESTRATOR_SERVICE_URL", "http://localhost:8080") 
 RULE_SERVICE_URL = f"{DATA_ORCHESTRATOR_SERVICE_URL}/api/rules"
-RULE_REFRESH_INTERVAL = 60  # seconds
+RULE_REFRESH_INTERVAL = 30  # seconds
 
 # -------------------------
 # Rule Model
@@ -73,6 +73,7 @@ async def rule_refresh_worker():
     """Continuously refresh RULE_CACHE in-place."""
     while True:
         try:
+            await asyncio.sleep(5) # wait for data orchestrator to start
             logger.info("Refreshing rules from Rule Service...")
             new_cache = await fetch_all_rules()
             RULE_CACHE.clear()
