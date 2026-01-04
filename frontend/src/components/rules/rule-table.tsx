@@ -1,7 +1,7 @@
 'use client'
 
 import Link from "next/link"
-import { useEffect, useMemo, useState } from "react"
+import { Suspense, useEffect, useMemo, useState } from "react"
 import { Trash2, CircleArrowOutUpRightIcon } from "lucide-react"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
@@ -13,6 +13,7 @@ import Rule from "@/types/rule"
 import { PAGE_SIZE } from "@/constants/shared"
 import { deleteRule, getOrgRules } from "@/lib/api/rule"
 import { toast } from "sonner"
+import Spinner from "../shared/spinner"
 
 function formatRule(rule: Rule) {
   return (
@@ -32,6 +33,7 @@ function formatRule(rule: Rule) {
 
 function RuleTable() {
   const [rules, setRules] = useState<Rule[]>([])
+  const [loading, setLoading] = useState(false);
   const [ruleToDelete, setRuleToDelete] = useState<Rule | null>(null)
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
@@ -66,12 +68,15 @@ function RuleTable() {
 
   useEffect(() => {
     async function fetchRules() {
+      setLoading(false)
       const response = await getOrgRules()
       if (response.status !== 200) {
         toast.error("Failed to fetch rules")
+        setLoading(false)
         return
       }
       setRules(response.data)
+      setLoading(false)
       toast.success("Rules loaded successfully")
     }
     fetchRules()
@@ -85,7 +90,6 @@ function RuleTable() {
         onChange={(e) => { setSearch(e.target.value); setPage(1) }}
         className="w-full"
       />
-
       <Table>
         <TableHeader>
           <TableRow>
@@ -104,34 +108,43 @@ function RuleTable() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {pageRules.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={2} className="text-muted-foreground">
-                No rules found
-              </TableCell>
-            </TableRow>
-          ) : (
-            pageRules.map((rule) => (
-              <TableRow key={rule._id}>
-                <TableCell className="text-base font-medium leading-relaxed">{rule._id}</TableCell>
-                <TableCell className="text-base font-medium leading-relaxed">{rule.rule_name}</TableCell>
-                <TableCell className="text-base font-medium leading-relaxed">
-                  {formatRule(rule)}
-                </TableCell>
-
-                <TableCell className="text-right space-x-2">
-                  <Link href={`/dashboard/rules/${rule._id}`}>
-                    <Button variant="ghost" size="sm" className="gap-1 text-primary hover:scale-110">
-                      <CircleArrowOutUpRightIcon className="h-4 w-4" />
-                    </Button>
-                  </Link>
-                  <Button variant="ghost" size="icon" className="text-red-600 hover:text-red-700 hover:scale-110" onClick={() => setRuleToDelete(rule)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+          <Suspense fallback={<Spinner />}>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center">
+                  <Spinner />
                 </TableCell>
               </TableRow>
-            ))
-          )}
+            ) :
+              pageRules.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-muted-foreground">
+                    No rules found
+                  </TableCell>
+                </TableRow>
+              ) : (
+                pageRules.map((rule) => (
+                  <TableRow key={rule._id}>
+                    <TableCell className="text-base font-medium leading-relaxed">{rule._id}</TableCell>
+                    <TableCell className="text-base font-medium leading-relaxed">{rule.rule_name}</TableCell>
+                    <TableCell className="text-base font-medium leading-relaxed">
+                      {formatRule(rule)}
+                    </TableCell>
+
+                    <TableCell className="text-right space-x-2">
+                      <Link href={`/dashboard/rules/${rule._id}`}>
+                        <Button variant="ghost" size="sm" className="gap-1 text-primary hover:scale-110">
+                          <CircleArrowOutUpRightIcon className="h-4 w-4" />
+                        </Button>
+                      </Link>
+                      <Button variant="ghost" size="icon" className="text-red-600 hover:text-red-700 hover:scale-110" onClick={() => setRuleToDelete(rule)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+          </Suspense>
         </TableBody>
       </Table>
       <AlertDialog open={!!ruleToDelete} onOpenChange={(open) => { if (!open) setRuleToDelete(null) }}>

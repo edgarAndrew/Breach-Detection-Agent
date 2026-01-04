@@ -36,7 +36,7 @@ function SignInForm() {
             }
             useAuth.getState().login(response.data.access_token)
             toast.success("Signed in successfully!")
-            router.replace('/dashboard')
+            router.replace('/dashboard/rules')
         }
         catch (error) {
             console.error("Error during sign in:", error)
@@ -47,7 +47,7 @@ function SignInForm() {
 
     useEffect(() => {
         if (isAuthenticated) {
-            router.replace('/dashboard')
+            router.replace('/dashboard/rules')
         }
     }, [isAuthenticated, router])
 

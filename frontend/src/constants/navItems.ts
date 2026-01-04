@@ -9,16 +9,16 @@ import {
 } from "lucide-react"
 
 const navigationItems = [
-    {
-        heading: "Overview",
-        items: [
-            {
-                title: "Dashboard",
-                url: "",
-                icon: Home,
-            },
-        ],
-    },
+    // {
+    //     heading: "Overview",
+    //     items: [
+    //         {
+    //             title: "Dashboard",
+    //             url: "",
+    //             icon: Home,
+    //         },
+    //     ],
+    // },
     {
         heading: "Configuration",
         items: [

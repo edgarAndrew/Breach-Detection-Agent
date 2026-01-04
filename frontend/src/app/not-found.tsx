@@ -15,7 +15,7 @@ export default function NotFoundPage() {
                 </p>
 
                 <Button asChild>
-                    <Link href="/dashboard">
+                    <Link href="/dashboard/rules">
                         Go to dashboard
                     </Link>
                 </Button>

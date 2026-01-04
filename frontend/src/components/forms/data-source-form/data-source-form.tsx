@@ -55,7 +55,7 @@ function DataSourceForm({ submitLabel }: { submitLabel: string }) {
                 toast.error("Failed to create datasource. Please try again.")
                 return
             }
-            router.replace('/dashboard')
+            router.replace('/dashboard/rules/new')
         }
         catch (error) {
             console.error("Error creating datasource:", error)
