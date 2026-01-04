@@ -30,6 +30,7 @@ JSON Schema
 
 [
     {{ 
+        "rule_name": <string>, # Concise Rule name
         "attribute_name": <string>, # Field name corresponding to this rule (must be one of the valid fields) 
         "threshold": <number>, # Hard limit threshold value 
         "near_thres": <number>, # Percentage limit value (e.g., 1 means 1%) 
