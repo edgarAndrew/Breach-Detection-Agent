@@ -1,6 +1,8 @@
-# Orix Maclaren Hackathon
+# Breach-Detection-Agent (Orix Maclaren Hackathon)
 
 ## Proactive Event Monitoring & Rule-Based Alerting System
+
+We managed to secure the runners up place in the hackathon for this project.
 
 A proactive monitoring platform that continuously evaluates events from
 multiple external systems, identifies rule violations and near-breaches,
@@ -9,7 +11,6 @@ and notifies teams before critical failures occur.
 The system is designed to shift organizations from **reactive
 monitoring** to **proactive risk prevention**.
 
-We managed to secure the runners up place in the hackathon for this project.
 ------------------------------------------------------------------------
 
 ## Problem Statement
