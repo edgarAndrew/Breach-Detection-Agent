@@ -1,5 +1,11 @@
 # Orix Maclaren Hackathon
 
+### System
+
+![Screenshot](Docs/system_design.png)
+
+![Screenshot](Docs/er_diagram_new.png)
+
 ### Setup Agent
 
 #### Create virtual env
